@@ -1,0 +1,6 @@
+[submodule "powerXel_boot/src/xelsdk"]
+	path = powerXel_boot/src/xelsdk
+	url = https://github.com/ROBOTIS-GIT/XelNetwork_FwSDK.git
+[submodule "powerXel_app/src/xelsdk"]
+	path = powerXel_app/src/xelsdk
+	url = https://github.com/ROBOTIS-GIT/XelNetwork_FwSDK.git
