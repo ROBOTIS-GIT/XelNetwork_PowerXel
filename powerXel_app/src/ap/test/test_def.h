@@ -10,7 +10,7 @@
 
 
 #define _TEST_ENABLE_LED            0
-#define _TEST_ENABLE_CURRENT        1
+#define _TEST_ENABLE_CURRENT        0
 
 
 

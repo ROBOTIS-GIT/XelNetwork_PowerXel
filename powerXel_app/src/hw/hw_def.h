@@ -61,6 +61,8 @@
 #define _USE_HW_DXLCMD
 #define _USE_HW_DXL
 
+#define _USE_HW_CTABLE
+
 
 #define _HW_DEF_DXLCMD_MAX_NODE               32
 #define _HW_DEF_DXLCMD_MAX_NODE_BUFFER_SIZE   32
