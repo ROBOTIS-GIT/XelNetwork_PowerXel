@@ -38,6 +38,7 @@ static boot_mode_t boot_mode = BOOT_JUMP_APP;
 static void bootLoaderSetup(void);
 static void bootJumpProcess(void);
 static void bootLoaderProcess(void);
+static void bootLedToggle(void);
 
 void bootInit(void)
 {
@@ -65,6 +66,7 @@ void bootProcess(void)
       break;
 
     case BOOT_LOADER :
+      bootLedToggle();
       bootLoaderProcess();
       break;
   }
@@ -167,5 +169,16 @@ static void bootLoaderProcess(void)
       }
     }
     boot_ch++;
+  }
+}
+
+static void bootLedToggle(void)
+{
+  static uint32_t pre_time = 0;
+
+  if(millis() - pre_time > 100)
+  {
+    pre_time = millis();
+    ledToggle(BOOT_LED);
   }
 }
