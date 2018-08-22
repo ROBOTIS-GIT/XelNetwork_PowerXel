@@ -48,7 +48,6 @@ static void  (*txDoneISR[_HW_DEF_DXLPORT_CH_MAX])(void);
 
 //-- Internal Functions
 //
-static void drvDxlportTxDoneISR1(void);
 
 
 
@@ -95,13 +94,7 @@ bool drvDxlportOpen(uint8_t ch, uint32_t baud)
 
   if (ch >= _HW_DEF_DXLPORT_CH_MAX) return false;
 
-
   uartOpen(dxlport_tbl[ch].ch, baud);
-
-  if (ch == _DEF_DXL1)
-  {
-    drvUartSetTxDoneISR(dxlport_tbl[ch].ch, drvDxlportTxDoneISR1);
-  }
 
   drvDxlportPowerEnable(ch);
 
@@ -235,29 +228,11 @@ uint32_t drvDxlportWrite(uint8_t ch, uint8_t *p_data, uint32_t length)
 
   drvDxlportTxEnable(ch);
 
-
   ret = uartWrite(dxlport_tbl[ch].ch, p_data, length);
 
-
-  // DXL1�� �뜲�씠�꽣 �넚�떊�쓣 DMA瑜� �궗�슜�븿�쑝濡쒖뜥 TxDisable�� �뜲�씠�꽣 醫낅즺 �씤�꽣�읇�듃�뿉�꽌 �떎�뻾.
-  //
-  if (ch != _DEF_DXL1)
-  {
-    drvDxlportTxDisable(ch);
-    tx_done[ch] = true;
-  }
+  drvDxlportTxDisable(ch);
+  tx_done[ch] = true;
 
   return ret;
 }
 
-void drvDxlportTxDoneISR1(void)
-{
-  drvDxlportTxDisable(_DEF_DXL1);
-
-  tx_done[_DEF_DXL1] = true;
-
-  if (txDoneISR[_DEF_DXL1] != NULL)
-  {
-    (*txDoneISR[_DEF_DXL1])();
-  }
-}
