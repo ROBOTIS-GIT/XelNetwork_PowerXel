@@ -222,7 +222,7 @@ uint16_t drvAdcConvVoltage(uint8_t ch, uint32_t adc_value)
   {
     case _DEF_ADC1:
     case _DEF_ADC2:
-      ret = (uint16_t)((adc_value * 330 * 100 / 100) / 4095);
+      ret = (uint16_t)((adc_value * 2808 * 100 / 100) / 4095);
       break;
       break;
   }

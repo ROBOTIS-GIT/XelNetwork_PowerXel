@@ -153,20 +153,20 @@ static void testAdcVolCurr(void)
     dxlportPrintf(_DEF_DXL1, "open is FAIL, _DEF_DXL1");
   }
 
-  ///dxl wheel mode
-  tx_data = 0x01;
-  ret = dxlcmdWrite(&dxl_cmd, 2, (uint8_t *)&tx_data, 11, 0x01, &resp.write, 100);
-  delay(10);
-
-  ///dxl torque on
-  tx_data = 0x01;
-  ret = dxlcmdWrite(&dxl_cmd, 2, (uint8_t *)&tx_data, 64, 0x01, &resp.write, 100);
-  delay(10);
-
-  ///dxl target speed value
-  tx_data = 360;
-  ret = dxlcmdWrite(&dxl_cmd, 2, (uint8_t *)&tx_data, 104, 0x04, &resp.write, 100);
-  delay(10);
+//  ///dxl wheel mode
+//  tx_data = 0x01;
+//  ret = dxlcmdWrite(&dxl_cmd, 2, (uint8_t *)&tx_data, 11, 0x01, &resp.write, 100);
+//  delay(10);
+//
+//  ///dxl torque on
+//  tx_data = 0x01;
+//  ret = dxlcmdWrite(&dxl_cmd, 2, (uint8_t *)&tx_data, 64, 0x01, &resp.write, 100);
+//  delay(10);
+//
+//  ///dxl target speed value
+//  tx_data = 360;
+//  ret = dxlcmdWrite(&dxl_cmd, 2, (uint8_t *)&tx_data, 104, 0x04, &resp.write, 100);
+//  delay(10);
 
   pre_time = millis();
 

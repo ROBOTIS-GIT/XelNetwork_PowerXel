@@ -31,6 +31,7 @@
 
 void hwInit(void)
 {
+  cmdifInit();
   qbufferInit();
 
   swtimerInit();
