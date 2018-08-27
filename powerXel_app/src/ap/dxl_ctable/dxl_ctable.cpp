@@ -33,7 +33,7 @@ ctable_attribute_t ctable_power[] =
   { P_EEP_DXL_BAUDRATE,             1,     1, _ATTR_RD | _ATTR_WR,     DXL_INIT_BAUD, _UPDATE_STARTUP , _DEF_TYPE_U08,    updateDxlBaud },
   { P_MILLIS,                       4,     1, _ATTR_RD           ,                 0, _UPDATE_NONE    , _DEF_TYPE_U32,    updateMillis },
   { P_VOLTAGE,                      4,     1, _ATTR_RD           ,                 0, _UPDATE_NONE    , _DEF_TYPE_U32,    updateVoltage },
-  { P_CURRENT,                      2,     1, _ATTR_RD           ,                 0, _UPDATE_NONE    , _DEF_TYPE_U32,    updateCurrent },
+  { P_CURRENT,                      4,     1, _ATTR_RD           ,                 0, _UPDATE_NONE    , _DEF_TYPE_U32,    updateCurrent },
 
 
 
@@ -252,7 +252,7 @@ void updateCurrent(uint32_t addr, uint8_t mode, uint16_t update_addr, uint8_t *p
 
   if (mode == _UPDATE_RD)
   {
-    value.u16Data = (currentRead0_1mA(1)/100);
+    value.u32Data = (currentRead0_1mA(1)/100);
     memcpy(p_data, &value.u8Data[update_addr], update_length);
   }
 }
