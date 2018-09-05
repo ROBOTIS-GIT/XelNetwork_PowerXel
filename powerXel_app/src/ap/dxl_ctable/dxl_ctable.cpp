@@ -29,8 +29,8 @@ ctable_attribute_t ctable_power[] =
   { P_CONST_MODEL_NUMBER,           2,     1, _ATTR_RD           ,  DXL_MODEL_NUMBER, _UPDATE_NONE    , _DEF_TYPE_U16,    NULL },
   { P_CONST_MODEL_INFO,             4,     1, _ATTR_RD           ,                 0, _UPDATE_NONE    , _DEF_TYPE_U32,    NULL },
   { P_CONST_FW_VERSION,             1,     1, _ATTR_RD           ,                 1, _UPDATE_NONE    , _DEF_TYPE_U08,    updateVersion },
-  { P_EEP_ID,                       1,     1, _ATTR_RD | _ATTR_WR,       DXL_INIT_ID, _UPDATE_STARTUP , _DEF_TYPE_U08,    updateDxlId },
-  { P_EEP_DXL_BAUDRATE,             1,     1, _ATTR_RD | _ATTR_WR,     DXL_INIT_BAUD, _UPDATE_STARTUP , _DEF_TYPE_U08,    updateDxlBaud },
+  { P_EEP_ID,                       1,     1, _ATTR_RD | _ATTR_WR,       DXL_INIT_ID, _UPDATE_SETUP   , _DEF_TYPE_U08,    updateDxlId },
+  { P_EEP_DXL_BAUDRATE,             1,     1, _ATTR_RD | _ATTR_WR,     DXL_INIT_BAUD, _UPDATE_SETUP   , _DEF_TYPE_U08,    updateDxlBaud },
   { P_MILLIS,                       4,     1, _ATTR_RD           ,                 0, _UPDATE_NONE    , _DEF_TYPE_U32,    updateMillis },
   { P_VOLTAGE,                      4,     1, _ATTR_RD           ,                 0, _UPDATE_NONE    , _DEF_TYPE_U32,    updateVoltage },
   { P_CURRENT,                      4,     1, _ATTR_RD           ,                 0, _UPDATE_NONE    , _DEF_TYPE_U32,    updateCurrent },
@@ -98,7 +98,7 @@ void updateDxlId(uint32_t addr, uint8_t mode, uint16_t update_addr, uint8_t *p_d
     }
   }
 
-  if (mode == _UPDATE_STARTUP)
+  if (mode == _UPDATE_SETUP)
   {
     if (addr == P_EEP_ID)
     {
@@ -185,7 +185,7 @@ void updateDxlBaud(uint32_t addr, uint8_t mode, uint16_t update_addr, uint8_t *p
     mode = _UPDATE_WR;
   }
 
-  if (mode == _UPDATE_STARTUP)
+  if (mode == _UPDATE_SETUP)
   {
     p_data[0] = eepromReadByte(EEP_ADDR_BAUD);
     baud = getDxlBaud(p_data[0]);
