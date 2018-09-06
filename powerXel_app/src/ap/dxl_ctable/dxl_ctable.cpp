@@ -9,6 +9,7 @@
 
 #include "ap.h"
 #include "util.h"
+#include "xels/xels.h"
 
 
 
@@ -17,11 +18,8 @@ void updateVersion(uint32_t addr, uint8_t mode, uint16_t update_addr, uint8_t *p
 void updateDxlId(uint32_t addr, uint8_t mode, uint16_t update_addr, uint8_t *p_data, uint16_t update_length);
 void updateDxlBaud(uint32_t addr, uint8_t mode, uint16_t update_addr, uint8_t *p_data, uint16_t update_length);
 void updateMillis(uint32_t addr, uint8_t mode, uint16_t update_addr, uint8_t *p_data, uint16_t update_length);
-void updateVoltage(uint32_t addr, uint8_t mode, uint16_t update_addr, uint8_t *p_data, uint16_t update_length);
-void updateCurrent(uint32_t addr, uint8_t mode, uint16_t update_addr, uint8_t *p_data, uint16_t update_length);
-
-
-
+void updateXelHeader(uint32_t addr, uint8_t mode, uint16_t update_addr, uint8_t *p_data, uint16_t update_length);
+void updateXelData(uint32_t addr, uint8_t mode, uint16_t update_addr, uint8_t *p_data, uint16_t update_length);
 
 ctable_attribute_t ctable_power[] =
 {
@@ -29,12 +27,23 @@ ctable_attribute_t ctable_power[] =
   { P_CONST_MODEL_NUMBER,           2,     1, _ATTR_RD           ,  DXL_MODEL_NUMBER, _UPDATE_NONE    , _DEF_TYPE_U16,    NULL },
   { P_CONST_MODEL_INFO,             4,     1, _ATTR_RD           ,                 0, _UPDATE_NONE    , _DEF_TYPE_U32,    NULL },
   { P_CONST_FW_VERSION,             1,     1, _ATTR_RD           ,                 1, _UPDATE_NONE    , _DEF_TYPE_U08,    updateVersion },
+<<<<<<< HEAD
+  { P_EEP_ID,                       1,     1, _ATTR_RD | _ATTR_WR,       DXL_INIT_ID, _UPDATE_SETUP , _DEF_TYPE_U08,    updateDxlId },
+  { P_EEP_DXL_BAUDRATE,             1,     1, _ATTR_RD | _ATTR_WR,     DXL_INIT_BAUD, _UPDATE_SETUP , _DEF_TYPE_U08,    updateDxlBaud },
+=======
   { P_EEP_ID,                       1,     1, _ATTR_RD | _ATTR_WR,       DXL_INIT_ID, _UPDATE_SETUP   , _DEF_TYPE_U08,    updateDxlId },
   { P_EEP_DXL_BAUDRATE,             1,     1, _ATTR_RD | _ATTR_WR,     DXL_INIT_BAUD, _UPDATE_SETUP   , _DEF_TYPE_U08,    updateDxlBaud },
+>>>>>>> 434f9b833a1bf3ff9edb0d5ce4384ff73539b902
   { P_MILLIS,                       4,     1, _ATTR_RD           ,                 0, _UPDATE_NONE    , _DEF_TYPE_U32,    updateMillis },
-  { P_VOLTAGE,                      4,     1, _ATTR_RD           ,                 0, _UPDATE_NONE    , _DEF_TYPE_U32,    updateVoltage },
-  { P_CURRENT,                      4,     1, _ATTR_RD           ,                 0, _UPDATE_NONE    , _DEF_TYPE_U32,    updateCurrent },
 
+  { P_XEL_HEADER_DATA_TYPE,         1,     1, _ATTR_RD | _ATTR_WR,                 0, _UPDATE_SETUP   , _DEF_TYPE_U08,    updateXelHeader },
+  { P_XEL_HEADER_DATA_INTERVAL,     4,     1, _ATTR_RD | _ATTR_WR,                 0, _UPDATE_NONE    , _DEF_TYPE_U32,    updateXelHeader },
+  { P_XEL_HEADER_DATA_NAME,         1,    32, _ATTR_RD | _ATTR_WR,                 0, _UPDATE_NONE    , _DEF_TYPE_U08,    updateXelHeader },
+  { P_XEL_HEADER_DATA_DIRECTION,    1,     1, _ATTR_RD           ,                 0, _UPDATE_NONE    , _DEF_TYPE_U08,    updateXelHeader },
+  { P_XEL_HEADER_DATA_ADDR,         2,     1, _ATTR_RD           ,                 0, _UPDATE_NONE    , _DEF_TYPE_U08,    updateXelHeader },
+  { P_XEL_HEADER_DATA_LENGTH,       1,     1, _ATTR_RD           ,                 0, _UPDATE_NONE    , _DEF_TYPE_U08,    updateXelHeader },
+
+  { P_XEL_DATA,                     1,   128, _ATTR_RD           ,                 0, _UPDATE_NONE    , _DEF_TYPE_U08,    updateXelData },
 
 
 
@@ -90,13 +99,6 @@ void updateVersion(uint32_t addr, uint8_t mode, uint16_t update_addr, uint8_t *p
 
 void updateDxlId(uint32_t addr, uint8_t mode, uint16_t update_addr, uint8_t *p_data, uint16_t update_length)
 {
-  if (mode == _UPDATE_INIT)
-  {
-    if (addr == P_EEP_ID)
-    {
-      mode = _UPDATE_WR;
-    }
-  }
 
   if (mode == _UPDATE_SETUP)
   {
@@ -180,10 +182,6 @@ void updateDxlBaud(uint32_t addr, uint8_t mode, uint16_t update_addr, uint8_t *p
 {
   uint32_t baud = 0;
 
-  if (mode == _UPDATE_INIT)
-  {
-    mode = _UPDATE_WR;
-  }
 
   if (mode == _UPDATE_SETUP)
   {
@@ -230,29 +228,145 @@ void updateMillis(uint32_t addr, uint8_t mode, uint16_t update_addr, uint8_t *p_
   }
 }
 
-void updateVoltage(uint32_t addr, uint8_t mode, uint16_t update_addr, uint8_t *p_data, uint16_t update_length)
+void updateXelHeader(uint32_t addr, uint8_t mode, uint16_t update_addr, uint8_t *p_data, uint16_t update_length)
 {
-  data_t value;
+  static XelNetwork::XelHeader_t *p_xel_header;
+  uint8_t *p_value;
+  uint32_t index;
 
-  adcSetup(0);
+  p_xel_header = xelsGetHeader(0);
+
+  if (mode == _UPDATE_SETUP)
+  {
+    if (addr == P_XEL_HEADER_DATA_TYPE)
+    {
+      uint8_t check_sum = 0;
+
+      for (int i=EEP_ADDR_XEL_HEADER_1; i<EEP_ADDR_XEL_HEADER_1_CHECKSUM; i++)
+      {
+        check_sum ^= eepromReadByte(i);
+      }
+
+      p_value = (uint8_t *)p_xel_header;
+
+      if (   check_sum != eepromReadByte(EEP_ADDR_XEL_HEADER_1_CHECKSUM)
+          || eepromReadByte(EEP_ADDR_XEL_HEADER_1_CHECK_AA) != 0xAA
+          || eepromReadByte(EEP_ADDR_XEL_HEADER_1_CHECK_55) != 0x55)
+      {
+        check_sum = 0;
+
+        index = 0;
+        for (int i=EEP_ADDR_XEL_HEADER_1; i<EEP_ADDR_XEL_HEADER_1_CHECKSUM; i++)
+        {
+          eepromWriteByte(i, p_value[index]);
+
+          check_sum ^= p_value[index];
+          index++;
+        }
+
+        eepromWriteByte(EEP_ADDR_XEL_HEADER_1_CHECK_AA, 0xAA);
+        eepromWriteByte(EEP_ADDR_XEL_HEADER_1_CHECK_55, 0x55);
+        eepromWriteByte(EEP_ADDR_XEL_HEADER_1_CHECKSUM, check_sum);
+      }
+      else
+      {
+        index = 0;
+        for (int i=EEP_ADDR_XEL_HEADER_1; i<EEP_ADDR_XEL_HEADER_1_CHECKSUM; i++)
+        {
+          p_value[index] = eepromReadByte(i);
+          index++;
+        }
+      }
+    }
+  }
+
 
   if (mode == _UPDATE_RD)
   {
-    value.u32Data = adcConvVoltage(0, adcRead(0));
-    memcpy(p_data, &value.u8Data[update_addr], update_length);
+    switch(addr)
+    {
+      case P_XEL_HEADER_DATA_TYPE:
+        p_value = (uint8_t *)&p_xel_header->data_type;
+        memcpy(p_data, &p_value[update_addr], update_length);
+        break;
 
+      case P_XEL_HEADER_DATA_INTERVAL:
+        p_value = (uint8_t *)&p_xel_header->data_get_interval_hz;
+        memcpy(p_data, &p_value[update_addr], update_length);
+        break;
+
+      case P_XEL_HEADER_DATA_NAME:
+        p_value = (uint8_t *)&p_xel_header->data_name[0];
+        memcpy(p_data, &p_value[update_addr], update_length);
+        break;
+
+      case P_XEL_HEADER_DATA_DIRECTION:
+        p_value = (uint8_t *)&p_xel_header->data_direction;
+        memcpy(p_data, &p_value[update_addr], update_length);
+        break;
+
+      case P_XEL_HEADER_DATA_ADDR:
+        p_value = (uint8_t *)&p_xel_header->data_addr;
+        memcpy(p_data, &p_value[update_addr], update_length);
+        break;
+
+      case P_XEL_HEADER_DATA_LENGTH:
+        p_xel_header->data_length = xelsGetDataTypeLength(p_xel_header->data_type);
+        p_value = (uint8_t *)&p_xel_header->data_length;
+        memcpy(p_data, &p_value[update_addr], update_length);
+        break;
+    }
+  }
+
+  if (mode == _UPDATE_WR)
+  {
+    switch(addr)
+    {
+      case P_XEL_HEADER_DATA_TYPE:
+        p_value = (uint8_t *)&p_xel_header->data_type;
+        memcpy(&p_value[update_addr], p_data, update_length);
+        break;
+
+      case P_XEL_HEADER_DATA_INTERVAL:
+        p_value = (uint8_t *)&p_xel_header->data_get_interval_hz;
+        memcpy(&p_value[update_addr], p_data, update_length);
+        break;
+
+      case P_XEL_HEADER_DATA_NAME:
+        p_value = (uint8_t *)&p_xel_header->data_name[0];
+        memcpy(&p_value[update_addr], p_data, update_length);
+        break;
+
+      case P_XEL_HEADER_DATA_DIRECTION:
+        p_value = (uint8_t *)&p_xel_header->data_direction;
+        memcpy(&p_value[update_addr], p_data, update_length);
+        break;
+    }
+
+    for (int i=0; i<update_length; i++)
+    {
+      eepromWriteByte(EEP_ADDR_XEL_HEADER_1 + (addr + update_addr) - P_XEL_HEADER_DATA_TYPE + i, p_data[i]);
+    }
+    uint8_t check_sum = 0;
+
+    for (int i=EEP_ADDR_XEL_HEADER_1; i<EEP_ADDR_XEL_HEADER_1_CHECKSUM; i++)
+    {
+      check_sum ^= eepromReadByte(i);
+    }
+    eepromWriteByte(EEP_ADDR_XEL_HEADER_1_CHECKSUM, check_sum);
   }
 }
 
-void updateCurrent(uint32_t addr, uint8_t mode, uint16_t update_addr, uint8_t *p_data, uint16_t update_length)
+void updateXelData(uint32_t addr, uint8_t mode, uint16_t update_addr, uint8_t *p_data, uint16_t update_length)
 {
-  data_t value;
-
-  adcSetup(1);
-
   if (mode == _UPDATE_RD)
   {
-    value.u32Data = (currentRead0_1mA(1)/100);
-    memcpy(p_data, &value.u8Data[update_addr], update_length);
+    xelsReadCallback(0, update_addr, p_data, update_length);
+  }
+
+  if (mode == _UPDATE_WR)
+  {
+    xelsWriteCallback(0, update_addr, p_data, update_length);
   }
 }
+

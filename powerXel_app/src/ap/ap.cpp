@@ -10,7 +10,7 @@
 #include "ap_def.h"
 
 #include "test.h"
-
+#include "xels/xels.h"
 
 static ap_t ap_log;
 
@@ -26,7 +26,7 @@ ap_t *p_ap = &ap_log;
 
 void apInit(void)
 {
-//  cmdifBegin(_DEF_UART1, 57600);
+  cmdifBegin(_DEF_UART1, 57600);
 
   p_ap->model_number = DXL_MODEL_NUMBER;
   p_ap->firmware_version = 1;
@@ -47,24 +47,21 @@ void apInit(void)
 
 void apMain(void)
 {
-  uint32_t pre_time = millis();
   bool busy;
 
+
+  xelsInit();
   dxlSlaveInit();
   dxlCtableInit();
 
+
+  ledOff(_DEF_LED1);
   while(1)
   {
-    busy = dxlSlaveLoop();
-    if ( busy == false)
-    {
-      // 紐낅졊�뼱 泥섎━以묒씠 �븘�땲硫�..
-    }
-
-    if(millis() - pre_time >= 500)
-    {
-      pre_time = millis();
-      ledToggle(_DEF_LED1);
-    }
+   busy = dxlSlaveLoop();
+   if ( busy == false)
+   {
+     // 명령어 처리중이 아니면..
+   }
   }
 }
