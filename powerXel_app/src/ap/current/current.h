@@ -18,8 +18,8 @@
 
 typedef struct Power
 {
-   double voltage;
-   double current;
+   uint32_t voltage;
+   uint32_t current;
 }Power_t;
 
 
