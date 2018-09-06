@@ -16,6 +16,13 @@
 
 #include "ap.h"
 
+typedef struct Power
+{
+   double voltage;
+   double current;
+}Power_t;
+
+
 
 uint16_t currentRead0_1mA(uint8_t ch);
 
