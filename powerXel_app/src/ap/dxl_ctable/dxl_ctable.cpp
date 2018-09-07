@@ -317,11 +317,6 @@ void updateXelHeader(uint32_t addr, uint8_t mode, uint16_t update_addr, uint8_t 
   {
     switch(addr)
     {
-      case P_XEL_HEADER_DATA_TYPE:
-        p_value = (uint8_t *)&p_xel_header->data_type;
-        memcpy(&p_value[update_addr], p_data, update_length);
-        break;
-
       case P_XEL_HEADER_DATA_INTERVAL:
         p_value = (uint8_t *)&p_xel_header->data_get_interval_hz;
         memcpy(&p_value[update_addr], p_data, update_length);
@@ -329,11 +324,6 @@ void updateXelHeader(uint32_t addr, uint8_t mode, uint16_t update_addr, uint8_t 
 
       case P_XEL_HEADER_DATA_NAME:
         p_value = (uint8_t *)&p_xel_header->data_name[0];
-        memcpy(&p_value[update_addr], p_data, update_length);
-        break;
-
-      case P_XEL_HEADER_DATA_DIRECTION:
-        p_value = (uint8_t *)&p_xel_header->data_direction;
         memcpy(&p_value[update_addr], p_data, update_length);
         break;
     }

@@ -46,7 +46,6 @@ void xelsInit(void)
 
   strcpy(p_xel_header->data_name, "power");
 
-
   xelsInitCallback(0);
 }
 
@@ -101,7 +100,7 @@ void xelsInitCallback(uint8_t ch)
   data_type = p_xel_header->data_type;
   switch(data_type)
   {
-    case XelNetwork::IMU:
+    default:
       break;
   }
 }
@@ -125,7 +124,6 @@ void xelsReadCallback(uint8_t ch, uint16_t addr, uint8_t *p_data, uint16_t lengt
       xel_data.POWER.current = (uint32_t)currentRead0_1mA(1)/100;
       break;
   }
-
 
   memcpy(p_data, &xel_data.u8Data[addr], length);
 }
