@@ -83,8 +83,8 @@ uint8_t xelsGetDataTypeLength(uint8_t data_type)
     case XelNetwork::POWER:
       ret = 8;
       break;
-    case XelNetwork::IMU:
-      ret = sizeof(Imu_t);
+    default:
+      ret = 4;
       break;
   }
 
