@@ -18,7 +18,7 @@
 
 
 
-uint16_t currentRead0_1mA(uint8_t ch);
+uint32_t currentRead0_1mA(uint8_t ch);
 
 
 #ifdef __cplusplus

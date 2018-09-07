@@ -61,7 +61,6 @@ void apMain(void)
    busy = dxlSlaveLoop();
    if ( busy == false)
    {
-     // 명령어 처리중이 아니면..
    }
   }
 }

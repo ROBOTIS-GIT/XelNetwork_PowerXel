@@ -31,7 +31,7 @@ ctable_attribute_t ctable_power[] =
   { P_EEP_DXL_BAUDRATE,             1,     1, _ATTR_RD | _ATTR_WR,     DXL_INIT_BAUD, _UPDATE_SETUP   , _DEF_TYPE_U08,    updateDxlBaud },
   { P_MILLIS,                       4,     1, _ATTR_RD           ,                 0, _UPDATE_NONE    , _DEF_TYPE_U32,    updateMillis },
 
-  { P_XEL_HEADER_DATA_TYPE,         1,     1, _ATTR_RD | _ATTR_WR,                 0, _UPDATE_SETUP   , _DEF_TYPE_U08,    updateXelHeader },
+  { P_XEL_HEADER_DATA_TYPE,         1,     1, _ATTR_RD           ,                 0, _UPDATE_SETUP   , _DEF_TYPE_U08,    updateXelHeader },
   { P_XEL_HEADER_DATA_INTERVAL,     4,     1, _ATTR_RD | _ATTR_WR,                 0, _UPDATE_NONE    , _DEF_TYPE_U32,    updateXelHeader },
   { P_XEL_HEADER_DATA_NAME,         1,    32, _ATTR_RD | _ATTR_WR,                 0, _UPDATE_NONE    , _DEF_TYPE_U08,    updateXelHeader },
   { P_XEL_HEADER_DATA_DIRECTION,    1,     1, _ATTR_RD           ,                 0, _UPDATE_NONE    , _DEF_TYPE_U08,    updateXelHeader },
@@ -57,6 +57,9 @@ ctable_attribute_t ctable_power[] =
 
 void dxlCtableInit(void)
 {
+  XelNetwork::XelHeader_t *p_xel_header;
+  uint8_t* p_value;
+
   if (eepromReadByte(EEP_ADDR_CHECK_AA) != 0xAA || eepromReadByte(EEP_ADDR_CHECK_55) != 0x55)
   {
     eepromWriteByte(EEP_ADDR_CHECK_AA, 0xAA);
@@ -64,6 +67,15 @@ void dxlCtableInit(void)
 
     eepromWriteByte(EEP_ADDR_ID, DXL_INIT_ID);
     eepromWriteByte(EEP_ADDR_BAUD, DXL_INIT_BAUD);
+
+    p_xel_header = xelsGetHeader(0);
+    p_value = (uint8_t *)p_xel_header;
+    eepromWriteByte(EEP_ADDR_XEL_HEADER_1, (uint8_t)p_xel_header->data_type);
+
+    for (uint8_t i=EEP_ADDR_XEL_HEADER_1 + 37; i< EEP_ADDR_XEL_HEADER_1 + 41; i++)
+    {
+      eepromWriteByte(i, p_value[i]);
+    }
   }
 
   ctableInit(&p_ap->ctable, NULL, 1024, ctable_power);

@@ -47,6 +47,9 @@ void xelsInit(void)
   strcpy(p_xel_header->data_name, "power");
 
   xelsInitCallback(0);
+
+  adcSetup(0);
+  adcSetup(1);
 }
 
 XelNetwork::XelHeader_t * xelsGetHeader(uint8_t ch)
