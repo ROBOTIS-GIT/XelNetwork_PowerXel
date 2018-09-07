@@ -15,7 +15,7 @@
 
 
 static XelNetwork::XelHeader_t xel_header = {
-      XelNetwork::DataType::UINT64,
+      XelNetwork::DataType::POWER,
       1,
       "power",
       XelNetwork::SEND,
@@ -38,7 +38,7 @@ void xelsInit(void)
 
   p_xel_header = &xel_header;
 
-  p_xel_header->data_type            = XelNetwork::DataType::UINT64;
+  p_xel_header->data_type            = XelNetwork::DataType::POWER;
   p_xel_header->data_get_interval_hz = 1;
   p_xel_header->data_direction       = XelNetwork::SEND;
   p_xel_header->data_addr            = 128;
@@ -80,6 +80,7 @@ uint8_t xelsGetDataTypeLength(uint8_t data_type)
     case XelNetwork::INT64:
     case XelNetwork::UINT64:
     case XelNetwork::FLOAT64:
+    case XelNetwork::POWER:
       ret = 8;
       break;
     case XelNetwork::IMU:
@@ -119,7 +120,7 @@ void xelsReadCallback(uint8_t ch, uint16_t addr, uint8_t *p_data, uint16_t lengt
       xel_data.MILLIS = millis();
       break;
 
-    case XelNetwork::UINT64:
+    case XelNetwork::POWER:
       xel_data.POWER.voltage = (uint32_t)adcConvVoltage(0, adcRead(0));
       xel_data.POWER.current = (uint32_t)currentRead0_1mA(1)/100;
       break;
