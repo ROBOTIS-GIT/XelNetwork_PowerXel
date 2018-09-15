@@ -15,7 +15,7 @@
 
 
 static XelNetwork::XelHeader_t xel_header = {
-      XelNetwork::DataType::POWER,
+      XelNetwork::POWER,
       1,
       "power",
       XelNetwork::SEND,
@@ -38,7 +38,7 @@ void xelsInit(void)
 
   p_xel_header = &xel_header;
 
-  p_xel_header->data_type            = XelNetwork::DataType::POWER;
+  p_xel_header->data_type            = XelNetwork::POWER;
   p_xel_header->data_get_interval_hz = 1;
   p_xel_header->data_direction       = XelNetwork::SEND;
   p_xel_header->data_addr            = 128;
